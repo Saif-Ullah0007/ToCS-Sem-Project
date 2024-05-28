@@ -1,5 +1,12 @@
 pipeline {
     agent any
+
+    environment {
+        GCLOUD_PROJECT = 'sixth-sequencer-423216-k8'
+        GCLOUD_ZONE = 'us-central1-a'
+        GCLOUD_INSTANCE = 'saif-project-apache-server'
+    }
+
     stages {
         stage('Build') {
             steps {
@@ -15,14 +22,14 @@ pipeline {
                 sh 'ls -la ${WORKSPACE}'
 
                 // Remove existing files on the remote server first
-                sh '''
-                    gcloud compute ssh root@saif-project-apache-server --zone=us-central1-a -- "rm -rf /var/www/html/*"
-                '''
+                sh """
+                    gcloud compute ssh root@${GCLOUD_INSTANCE} --zone=${GCLOUD_ZONE} --project=${GCLOUD_PROJECT} -- "rm -rf /var/www/html/*"
+                """
 
                 // Then copy new files from Jenkins workspace to the remote server
-                sh '''
-                    gcloud compute scp --recurse ${WORKSPACE}/* root@saif-project-apache-server:/var/www/html --zone=us-central1-a
-                '''
+                sh """
+                    gcloud compute scp --recurse ${WORKSPACE}/* root@${GCLOUD_INSTANCE}:/var/www/html --zone=${GCLOUD_ZONE} --project=${GCLOUD_PROJECT}
+                """
             }
         }
         stage('Run') {
