@@ -29,6 +29,6 @@ pipeline {
             steps {
                 echo 'Application run stage'
             }
-        }
-    }
+        }
+    }
 }
