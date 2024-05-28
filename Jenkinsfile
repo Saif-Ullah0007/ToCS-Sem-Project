@@ -1,33 +1,26 @@
 pipeline {
     agent any
-    environment {
-        REMOTE_SERVER = 'saif-project-apache-server'
-        REMOTE_ZONE = 'us-central1-a'
-        REMOTE_PATH = '/var/www/html'
-    }
     stages {
         stage('Build') {
             steps {
-                echo 'Application build stage...'
+                echo 'Application build stage...' 
             }
         }
         stage('Test') {
             steps {
-                sh 'pwd'
-                sh 'ls -la ${WORKSPACE}'
                 // Remove existing files on the remote server first
                 sh '''
-                    gcloud compute ssh ${REMOTE_SERVER} --zone=${REMOTE_ZONE} -- "rm -rf ${REMOTE_PATH}/*"
+                    gcloud compute ssh root@saif-project-apache-server --zone=us-central1-a -- "rm -rf /var/www/html/*"
                 '''
                 // Then copy new files from Jenkins workspace to the remote server
                 sh '''
-                    gcloud compute scp --recurse ${WORKSPACE}/* ${REMOTE_SERVER}:${REMOTE_PATH} --zone=${REMOTE_ZONE}
+                    gcloud compute scp --recurse /var/lib/jenkins/workspace/ToCS-Sem-Project_main/* root@saif-project-apache-server:/var/www/html --zone=us-central1-a
                 '''
             }
         }
         stage('Run') {
             steps {
-                echo 'Application run stage'
+                echo 'Application run stage' 
             }
         }
     }
